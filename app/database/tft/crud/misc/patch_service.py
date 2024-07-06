@@ -38,6 +38,14 @@ def get_patch(session: Session, patch_id: str):
     return db_patch
 
 
+def get_patch_by_set(session: Session, set_id: str):
+    statement = select(Patch).where(Patch.set_id == set_id)
+    db_patch = session.exec(statement)
+    if not db_patch:
+        raise SetNotFoundError("Set not found")
+    return db_patch
+
+
 def get_patches(session: Session, offset: int, limit: int):
     return session.exec(select(Patch).offset(offset).limit(limit)).all()
 

@@ -1,3 +1,8 @@
+from sqlmodel import Session
+
+from app.database.tft.crud.account.region_service import create_region, RegionAlreadyExistsError, update_region
+from app.models.account.region import RegionCreate, RegionUpdate
+
 regions = [
     {"label": "NA", "region_id": "na", "server": "na1", "description": "North America"},
     {"label": "EUW", "region_id": "euw", "server": "euw1", "description": "Europe West"},
@@ -17,5 +22,13 @@ regions = [
     {"label": "TR", "region_id": "tr", "server": "tr1", "description": "Turkey"},
 ]
 
-for i in regions:
-    insertRegion(i)
+
+def insert_region(session: Session):
+    for region_data in regions:
+        try:
+            region = RegionCreate(**region_data)
+            create_region(session, region)
+        except RegionAlreadyExistsError:
+            region_id = region_data.pop("region_id")
+            region = RegionUpdate(**region_data)
+            update_region(session, region_id, region)
